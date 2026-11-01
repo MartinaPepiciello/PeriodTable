@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Period Table</title>
+  <meta name="description" content="A tiny, private period tracker.">
+  <meta name="theme-color" content="#fff8ef">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Period Table">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter>
+  </svg>
+
+  <header class="masthead">
+    <h1 class="title"><span class="ink-red" data-text="Period">Period</span><span class="ink-pink" data-text="Table">Table</span></h1>
+    <button class="sync-pill" id="sync-pill" type="button" aria-label="Sync status"></button>
+  </header>
+
+  <main>
+    <!-- CYCLE -->
+    <section class="view" id="view-cycle" data-view="cycle">
+      <div class="today" id="today"></div>
+
+      <div class="log-row">
+        <button class="btn btn-primary" id="log-today" type="button">Period started today</button>
+        <button class="btn btn-ghost" id="log-other" type="button">Other day…</button>
+      </div>
+
+      <div class="calendar card">
+        <div class="cal-head">
+          <button class="icon-btn" id="cal-prev" type="button" aria-label="Previous month">‹</button>
+          <button class="cal-title" id="cal-title" type="button" title="Back to today"></button>
+          <button class="icon-btn" id="cal-next" type="button" aria-label="Next month">›</button>
+        </div>
+        <div class="cal-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="legend">
+          <span><i class="sw sw-period"></i>period</span>
+          <span><i class="sw sw-pred"></i>predicted</span>
+          <span><i class="sw sw-today"></i>today</span>
+          <span><b class="sw-cd">12</b>cycle day</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="view" id="view-history" data-view="history" hidden>
+      <div class="stats" id="stats"></div>
+      <div class="card">
+        <h2 class="section-title">Cycle lengths</h2>
+        <p class="hint">Newest first — scroll down to go back in time. Tap a cycle to see it on the calendar.</p>
+        <div class="bars" id="bars"></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings" data-view="settings" hidden>
+      <div class="card">
+        <h2 class="section-title">Prediction</h2>
+        <div class="segmented" role="radiogroup">
+          <label><input type="radio" name="mode" value="average"><span>Average</span></label>
+          <label><input type="radio" name="mode" value="fixed"><span>Fixed</span></label>
+        </div>
+        <label class="field" data-mode-field="average">
+          <span>Average over the last</span>
+          <span class="num"><input type="number" id="set-avg" min="1" max="36" inputmode="numeric"> cycles</span>
+        </label>
+        <label class="field" data-mode-field="fixed">
+          <span>Cycle length</span>
+          <span class="num"><input type="number" id="set-fixed" min="10" max="90" inputmode="numeric"> days</span>
+        </label>
+        <p class="hint" id="pred-explain"></p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Calendar</h2>
+        <label class="field">
+          <span>A period lasts about</span>
+          <span class="num"><input type="number" id="set-plen" min="1" max="14" inputmode="numeric"> days</span>
+        </label>
+        <label class="field">
+          <span>Show upcoming</span>
+          <span class="num"><input type="number" id="set-ahead" min="1" max="12" inputmode="numeric"> periods</span>
+        </label>
+      </div>
+
+      <div class="card" id="sync-card"></div>
+
+      <div class="card">
+        <h2 class="section-title">Your data</h2>
+        <p class="hint">A plain CSV of your start dates — a backup that works without any server.</p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="export-csv" type="button">Export CSV</button>
+          <label class="btn btn-ghost">Import CSV<input type="file" id="import-csv" accept=".csv,text/csv,text/plain" hidden></label>
+        </div>
+        <details class="csv-help">
+          <summary>How should a file for import look?</summary>
+          <p class="hint">One period start date per line, in the first column. A header line is optional, and any other columns are ignored.</p>
+          <pre class="csv-sample">start_date
+2026-08-19
+2026-09-15
+2026-10-14</pre>
+          <p class="hint">Dates can be written as <code>2026-10-14</code>, <code>14/10/2026</code>, <code>14.10.2026</code> or <code>14-10-2026</code> (day before month). Imported dates are added to the ones you already have; nothing is overwritten.</p>
+        </details>
+      </div>
+
+      <p class="colophon">Period Table · printed in rose &amp; magenta</p>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button type="button" data-tab="cycle" class="active"><span class="tab-el" aria-hidden="true"><span class="tab-z">6</span>C</span>Cycle</button>
+    <button type="button" data-tab="history"><span class="tab-el" aria-hidden="true"><span class="tab-z">1</span>H</span>History</button>
+    <button type="button" data-tab="settings"><span class="tab-el" aria-hidden="true"><span class="tab-z">16</span>S</span>Settings</button>
+  </nav>
+
+  <dialog id="day-sheet" class="sheet"></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

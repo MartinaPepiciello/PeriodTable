@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "period-table",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  // The static PWA lives in ./public and is served directly by Cloudflare.
+  // Requests that don't match a file (i.e. /api/*) fall through to the worker.
+  "assets": { "directory": "./public" },
+  "kv_namespaces": [
+    // Replace the id with the one printed by: npx wrangler kv namespace create VAULT
+    { "binding": "VAULT", "id": "6816b909ee3840d5ac40728e86dd789a" }
+  ]
+}
